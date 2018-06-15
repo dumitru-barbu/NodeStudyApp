@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const config = require('../config/config');
-const roles = require('./roles');
 
 const UserSchema = mongoose.Schema({
+	_id: mongoose.Schema.Types.ObjectId,
     name: {
-        type: String
+		type: String,
+		required: true
     },
     email: {
         type: String,
@@ -32,12 +33,17 @@ const UserSchema = mongoose.Schema({
 		required: true
 	}
 });
+const User = mongoose.model('user', UserSchema);
+const role = {
+	USER: 'USER',
+	ADMIN: 'ADMIN'
+};
 
 UserSchema.pre('save', async function(next) {
 	let user = this;
 	if (!user.isModified('password')) return next();
 	if (!user.role) {
-		user.role = roles.USER;
+		user.role = role.USER;
 	}
 
 	try {
@@ -51,9 +57,9 @@ UserSchema.pre('save', async function(next) {
 	}
 });
 
-const User = mongoose.model('User', UserSchema);
 
 module.exports.User = User;
+module.exports.Role = role;
 
 module.exports.getById = async (id, callback) => {
     return await User.findById(id, callback);

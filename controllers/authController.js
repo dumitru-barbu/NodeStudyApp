@@ -1,19 +1,19 @@
 const crypto = require('crypto');
-const users = require('../models/users');
+const userModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
-const mailController = require('./mail');
+const mailController = require('./mailController');
 
 module.exports.authenticate = async (req, res) => {
 	const username = req.body.username;
 	const password = req.body.password;
 	try {
-		let user = await users.getByUsername(username);
+		let user = await userModel.getByUsername(username);
 		if (!user) {
 			return res.status(401).send('Invalid credentials.');
 		}
 		
-		let isMatch = await users.comparePassword(password, user.password);
+		let isMatch = await userModel.comparePassword(password, user.password);
 		if (isMatch) {
 			const token = jwt.sign(user.toJSON(), config.passportSecret, {
 				expiresIn: config.tokenExpireTimeInSeconds
@@ -42,13 +42,13 @@ module.exports.sendPasswordReset = async (req, res) => {
 		let token = await crypto.randomBytes(config.resetPAsswordTokenLength).toString('hex');
 		
 		const username = req.body.username;
-		let user = await users.getByUsername(username);
+		let user = await userModel.getByUsername(username);
 		if (!user) {
 			return res.status(400).send('Invalid email');
 		}
 		user.passwordResetToken = token;
 		user.passwordResetExpireDate = Date.now() + config.passwordResetTokenExpireTimeInMiniseconds;
-		await users.save(user);
+		await userModel.save(user);
 
 		var mailOptions = {
 			to: user.email,
@@ -64,12 +64,12 @@ module.exports.sendPasswordReset = async (req, res) => {
 	} catch (err) {
 		console.log(err);
 		res.status(500).send('Error when trying to reset your password');
-	}	
+	}
 };
 
 module.exports.resetPassword = async (req, res) => {
 	try {
-		let user = await users.getByPasswordResetToken(req.params.token);
+		let user = await userModel.getByPasswordResetToken(req.params.token);
 
 		if (!user) {
 			res.status(401).send('Unauthorized password reset attempt.');
@@ -79,7 +79,7 @@ module.exports.resetPassword = async (req, res) => {
 		user.passwordResetToken = undefined;
 		user.passwordResetExpireDate = undefined;
 
-		user = await users.save(user);
+		user = await userModel.save(user);
 
 		var mailOptions = {
 			to: user.email,

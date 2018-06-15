@@ -1,7 +1,7 @@
-const users = require('../models/users');
+const userModel = require('../models/userModel');
 
 module.exports.create = async (req, res) => {
-	let newUser = new users.User({
+	let newUser = new userModel.User({
 		name: req.body.name,
 		email: req.body.email,
 		username: req.body.username,
@@ -9,7 +9,7 @@ module.exports.create = async (req, res) => {
 	});
 
 	try {
-		await users.save(newUser);
+		await userModel.save(newUser);
 		res.status(201);
 		res.json({ success: true, msg: 'User registered.' });
 	} catch(err) {
@@ -31,7 +31,7 @@ module.exports.getAll = async (req, res) => {
 module.exports.getById = async (req, res) => {
 	try {
 		let userId = req.params.id;
-		let user = await users.getById(userId);
+		let user = await userModel.getById(userId);
 		res.json(user);
 	} catch (err) {
 		console.log(err);
@@ -47,7 +47,7 @@ module.exports.update = async (req, res) => {
 			email: req.body.email,
 			role: req.body.role
 		};
-		let updatedUser = await users.update(user);
+		let updatedUser = await userModel.update(user);
 		res.json(updatedUser);
 	} catch (err) {
 		console.log(err);
@@ -58,7 +58,7 @@ module.exports.update = async (req, res) => {
 module.exports.delete = async (req, res) => {
 	try {
 		let userId = req.params.id;
-		let user = await users.delete(userId);
+		let user = await userModel.delete(userId);
 		res.status(204);
 		res.json({ success: true, msg: 'User deleted' });
 	} catch (err) {

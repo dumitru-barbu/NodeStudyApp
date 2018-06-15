@@ -6,5 +6,6 @@ module.exports = {
 	passwordResetTokenExpireTimeInMiniseconds: 86400000, //1 day
 	resetPAsswordTokenLength: 25,
 	mailUser: 'testEmailAddress',
-	mailPassword: 'testPassword'
+	mailPassword: 'testPassword',
+	mailService: 'gmail'
 }

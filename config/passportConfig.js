@@ -1,6 +1,6 @@
 const JWTStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../models/user');
+const userModel = require('../models/userModel');
 const config = require('./config');
 
 module.exports = function(passport) {
@@ -10,7 +10,7 @@ module.exports = function(passport) {
 
     passport.use(new JWTStrategy(options, async (jwtPayload, done) => {
 		try {
-			let user = await User.getById(jwtPayload._id);
+			let user = await userModel.getById(jwtPayload._id);
 			
 			if(user) {
                 return done(null, user);
